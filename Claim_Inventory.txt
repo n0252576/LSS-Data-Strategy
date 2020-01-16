@@ -1,0 +1,19 @@
+fact_invt_clm_v.yr_mnth_id, INT(fact_invt_clm_v.yr_mnth_id / 100) AS Inventory_Year, MOD(fact_invt_clm_v.yr_mnth_id, 100) AS Inventory_Month,
+
+fact_invt_clm_v.opnd_clm_qty AS Openings, fact_invt_clm_v.new_opnd_clm_qty AS New_Openings, fact_invt_clm_v.reopnd_clm_qty AS ReOpenings, fact_invt_clm_v.clsd_clm_qty AS Closings, fact_invt_clm_v.pendg_clm_qty AS Pending,
+
+fact_invt_clm_v.cum_days_in_litg_qty AS Cycle_Time,
+
+FROM
+
+LGLBI.fact_invt_clm_v INNER JOIN LGLBI.dim_referral_v ON (fact_invt_clm_v.rptg_aor_refr_id = dim_referral_v.refr_id) INNER JOIN LGLBI.dim_clm_v ON (fact_invt_clm_v.CLM_ID = dim_clm_v.id_clm) LEFT OUTER JOIN LGLBI.dim_lob_rptg_cde_v ON (dim_clm_v.lob_rptg_cde = dim_lob_rptg_cde_v.rptg_lob_cde) LEFT OUTER JOIN LGLALMS.cntr_t ON (cntr_t.id_cntr = dim_clm_v.id_cntr) LEFT OUTER JOIN LGLBI.dim_fincl_rptg_grp_v ON (dim_clm_v.fincl_rptg_grp_cde = dim_fincl_rptg_grp_v.fincl_rptg_grp_cde) LEFT OUTER JOIN LGLANAL.ci_claim_owner ON (dim_clm_v.id_clm=ci_claim_owner.clm_id)
+
+INNER JOIN LGLBI.dim_prvd_v on (fact_invt_clm_v.rptg_aor_prvd_id=dim_prvd_v.prvd_id) LEFT OUTER JOIN LGLBI.dim_dfns_nlm_v ON (fact_invt_clm_v.rptg_cse_fact_id=dim_dfns_nlm_v.cse_fact_id) LEFT OUTER JOIN LGLBI.dim_vnu_v ON (dim_dfns_nlm_v.vnu_id=dim_vnu_v.vnu_id) LEFT OUTER JOIN LGLBI.dim_loo_div_off_v ON (dim_loo_div_off_v.loo_div_off_cde=dim_dfns_nlm_v.Num_Div_Off_Owng_Lgl_Mttr)
+
+WHERE
+
+fact_invt_clm_v.yr_mnth_id BETWEEN &INVT_START AND &INVT_END AND dim_dfns_nlm_v.dfns_void_i = 'N'
+
+AND CALCULATED SBU_Group IN (&SBU) AND CALCULATED Claim_Type in (&CLAIM) /* AND dim_clm_v.hms_i_cde IN (&HMS)*/ AND dim_clm_v.cerc_i IN (&CERC) AND dim_prvd_v.prvd_typ_nme IN (&PRVD)
+
+;

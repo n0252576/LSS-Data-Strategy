@@ -1,0 +1,39 @@
+
+CREATE TABLE WORK."YTD_Inventory_by_Case"n AS 
+ SELECT t1.Inventory_Year, 
+ t1.SBU_Group, 
+ t1.Panel_Type, 
+ /* YTD_Openings */
+ (sum(case when t1.YTD_Indicator = 1 then t1.Openings else 0 end)) AS YTD_Openings, 
+ /* YTD_Closings */
+ (sum(case when t1.YTD_Indicator = 1 then t1.Closings else 0 end)) AS YTD_Closings, 
+ /* YTD_Pending */
+ (sum(case when t1.YTD_Indicator = 1 and t1.Current_Month_Indicator = 1 then t1.Pending else 0 end)) AS 
+ YTD_Pending
+ FROM WORK.INVENTORY_BY_CASE t1
+ GROUP BY t1.Inventory_Year,
+ t1.SBU_Group,
+ t1.Panel_Type;
+ QUIT;
+
+PROC SQL;
+ CREATE TABLE WORK."Rolling_Inventory_by_Case"n AS 
+ SELECT t1.SBU_Group, 
+ t1.Panel_Type, 
+ /* Current_Year_Openings */
+ (sum(case when t1.Rolling_Year_Indicator = 'Current' then t1.Openings else 0 end)) AS Current_Year_Openings, 
+ /* Prior_Year_Openings */
+ (sum(case when t1.Rolling_Year_Indicator = 'Prior' then t1.Openings else 0 end)) AS Prior_Year_Openings, 
+ /* Current_Year_Opening */
+ (sum(case when t1.Rolling_Year_Indicator = 'Current' then t1.Closings else 0 end)) AS Current_Year_Opening, 
+ /* Prior_Year_Closings */
+ (sum(case when t1.Rolling_Year_Indicator = 'Prior' then t1.Closings else 0 end)) AS Prior_Year_Closings, 
+ /* Current_Year_Pending */
+ (sum(case when t1.Rolling_Year_Indicator = 'Current' and t1.Current_Month_Indicator = 1 then t1.Pending 
+ else 0 end)) AS Current_Year_Pending, 
+ /* Prior_Year_Pending */
+ (sum(case when t1.Rolling_Year_Indicator = 'Prior' and t1.Current_Month_Indicator = 1 then t1.Pending else 
+ 0 end)) AS Prior_Year_Pending
+ FROM WORK.INVENTORY_BY_CASE t1
+ GROUP BY t1.SBU_Group,
+ t1.Panel_Type;
