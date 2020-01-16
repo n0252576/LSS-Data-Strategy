@@ -1,0 +1,6 @@
+-- Use this DBC Query to find columns with certain names, even if you can't remember the entire name, or how it is abbreviated
+-- Insert the column name you're looking for in the quotes, the % symbols are wildcard symbols 
+-- For Ex. A wildcard symbol preceeding a name will look for any column containing Rejecting, removing the % would look for all columns that begin with Rejection
+
+SELECT * FROM "DBC"."COLUMNS" COL
+WHERE COL.ColumnName LIKE '%Rejection%';

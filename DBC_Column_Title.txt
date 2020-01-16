@@ -1,0 +1,5 @@
+-- Query for Searching for a column based on the title. Coulmn Title is the technical abbreviated name
+-- The % designate wildcards, query will return all rows containing the quoted text. Removing the preceeding % will return all results that begin with the quoted text
+
+SELECT * FROM "DBC"."COLUMNS" COL
+WHERE COL.ColumnTitle LIKE '%EPSLN_HH_ID%';

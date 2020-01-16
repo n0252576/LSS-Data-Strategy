@@ -1,0 +1,6 @@
+-- Searching For Tables by Table Name, if you can't remember the enitre name, you can insert 'Claim' for ex. 
+-- Change the Text in the quotes, the % are wildcards, it will search for and return anything with the letters ACKMNT in it
+-- if you are confident that the beginning of the table name starts with ACKMNT, then you can remove the wildcard symbol preceeding it, and vice versa
+
+SELECT * FROM "DBC"."Tables" TBL
+WHERE TBL.TableName LIKE '%ACKMNT%'
