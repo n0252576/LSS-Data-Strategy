@@ -1,0 +1,142 @@
+
+proc sql;
+
+Create table work.Inventory_by_Case as
+
+SELECT
+
+dim_dfns_nlm_v.cse_fact_id AS Case_Fact_ID, 
+ dim_dfns_nlm_v.alms_dfns_nlm_id AS Defense_ID,
+ dim_clm_v.id_clm as Claim_ID, 
+ dim_clm_v.num_clm as Claim_Number,
+ dim_referral_v.refr_id AS Referral_ID,
+
+CASE 
+ WHEN dim_clm_v.sbu_rptg_grp_cde = 'PI' THEN 'USCM'
+ ELSE dim_clm_v.sbu_rptg_grp_cde
+ END AS SBU_Group,
+
+dim_clm_v.cerc_i AS CERC_Indicator, 
+ dim_fincl_rptg_grp_v.sbu_cde as Legacy_SBU,
+
+CASE
+ WHEN dim_clm_v.nme_clm_typ = 'WC' THEN 'GRS'
+ ELSE dim_clm_v.glbl_org_cde
+ END AS Global_Organization_Code,
+
+CASE
+ WHEN dim_clm_v.nme_clm_typ = 'WC' THEN 'Global Risk Solutions'
+ ELSE dim_clm_v.glbl_org_nme
+ END AS Global_Organization_Name,
+
+CASE
+ WHEN dim_clm_v.nme_clm_typ = 'ENV' THEN 'PAL'
+ ELSE dim_clm_v.nme_clm_typ
+ END AS Claim_Type LABEL = 'Claim Type',
+
+dim_clm_v.busn_divn_cde AS Business_Division,
+ dim_clm_v.lin_of_busn AS Line_of_Business,
+ dim_lob_rptg_cde_v.lob_catg_cde AS Line_Of_Business_Category_Code, 
+ dim_lob_rptg_cde_v.lob_catg_nme AS Line_Of_Business_Category_Name, 
+ dim_clm_v.cc_mkt_rptg_grp_nme AS Market_Reporting_Group_Name, 
+ dim_fincl_rptg_grp_v.mkt_nme AS Market_Name, 
+ dim_fincl_rptg_grp_v.fincl_rptg_grp_cde AS Financial_Reporting_Group_Code, 
+ dim_fincl_rptg_grp_v.fincl_rptg_grp_nme AS Financial_Reporting_Group_Name, 
+ dim_clm_v.cmplx_clm AS Complexity, 
+ COALESCE(dim_clm_v.rtng_pln_grp_nme, 'N/A') AS Rating_Plan, 
+ dim_clm_v.hms_i_cde as Helmsman_Indicator, 
+ dim_clm_v.hms_roff_cde AS HMS_Runoff_Indicator, 
+ cntr_t.acct_num as Account_Number,
+ cntr_t.cust_nme as Customer_Name,
+ dim_dfns_nlm_v.cse_caption AS Case_Caption,
+ dim_dfns_nlm_v.mttr_typ_nme as Matter_Type_Name,
+ dim_dfns_nlm_v.cse_typ_cde AS Case_Type_Code, 
+ dim_dfns_nlm_v.nme_typ_lit as Litigation_Type, 
+ dim_clm_v.nme_src_clm AS Claim_Source_Name,
+ dim_clm_v.cde_off_clm AS Claim_Office_Code, 
+ dim_clm_v.clm_off_nme AS Claim_Office_Name, 
+ STRIP(dim_clm_v.cde_off_clm) || ' - ' || STRIP(dim_clm_v.clm_off_nme) AS Claim_Office, 
+ dim_loo_div_off_v.loo_div_off_cde AS Legal_Owning_Office_Code, 
+ dim_loo_div_off_v.lm_off_nme AS Legal_Owning_Office_Name,
+
+CASE 
+ WHEN SUBSTR(dim_loo_div_off_v.loo_div_off_cde, 3, 2) = 'XX' THEN 'Non-Serviced'
+ else STRIP(dim_loo_div_off_v.loo_div_off_cde) || ' - ' || STRIP(dim_loo_div_off_v.lm_off_nme)
+ END AS Legal_Owning_Office,
+
+dim_loo_div_off_v.lgl_mgt_rgn_nme AS Legal_Owning_Office_Region,
+
+/REFERRAL DATA/ 
+ dim_referral_v.rfrl_typ_id AS Referral_Type_ID, 
+ dim_referral_v.rfrl_typ_nme AS Referral_Type_Name,
+
+CASE 
+ WHEN dim_referral_v.nme_refr_reas = 'Approval Type' THEN dim_referral_v.app_typ_nme
+ ELSE dim_referral_v.nme_refr_reas
+ END AS Referral_Reason,
+
+dim_referral_v.app_typ_nme AS Approval_Type_Name, 
+ dim_referral_v.flt_fee_i AS Flat_Fee_Indicator, 
+ dim_referral_v.id_prvd_role AS Provider_Role_ID, 
+ dim_referral_v.prvd_role_nme AS Provider_Role_Name,
+
+/PROVIDER INFO/ 
+ dim_prvd_v.prvd_typ_nme AS Provider_Type_Name, 
+ dim_prvd_v.prvd_id AS Provider_ID, 
+ dim_prvd_v.prvd_nme AS Provider_Name, 
+ dim_prvd_v.prvd_stt_cde AS Provider_State, 
+ dim_prvd_v.lgl_mgt_rgn_nme AS Provider_Region,
+
+COALESCE (CASE 
+ WHEN dim_referral_v.prvd_typ_nme = 'Field Legal' then 'Field Legal' 
+ WHEN dim_referral_v.prvd_typ_nme = 'Corporate' THEN 'Corporate' 
+ ELSE dim_referral_v.panl_typ_nme 
+ END, 'No Panel') AS Panel_Type,
+
+CASE 
+ WHEN STRIP(dim_dfns_nlm_v.num_div_off_owng_lgl_mttr) = '' Then 'Non-Serviced' 
+ When SUBSTR(dim_dfns_nlm_v.num_div_off_owng_lgl_mttr, 3, 2) = 'XX' Then 'Non-Serviced' 
+ Else 'Serviced' 
+ End AS Serviced_Area_Indicator,
+
+/CLAIM OWNER DATA/ 
+ ci_claim_owner.clm_owner_id AS Claim_Owner_Id,
+ ci_claim_owner.clm_owner_nme AS Claim_Owner_Name, 
+ ci_claim_owner.department AS Claim_Owner_Department, 
+ ci_claim_owner.office AS Claim_Owner_Office, 
+ ci_claim_owner.supervisor AS Claim_Owner_Supervisor,
+
+/VENUE DATA/ 
+ dim_vnu_v.vnu_id AS Venue_ID, 
+ COMPRESS(dim_vnu_v.vnu_nme, , 'c') AS Venue_Name, 
+ dim_vnu_v.vnu_addr_cnty_nme AS Venue_County, 
+ dim_dfns_nlm_v.mttr_vnu_stt_cde as Venue_State, 
+ /* &LQSR_Region AS LQSR_Region, */
+
+/IMPORTANT DATES/ 
+ dim_clm_v.rptg_bo_clm_dte AS Claim_Reported_Date FORMAT MMDDYY10., 
+ dim_clm_v.cde_clm_stts AS Claim_Status_Code, 
+ CASE 
+ WHEN dim_clm_v.cde_clm_stts IN ('F', 'C') THEN 'Closed' 
+ ELSE 'Open' 
+ END AS Claim_Status_Name,
+
+CASE 
+ WHEN dim_clm_v.cde_clm_stts IN ('F', 'C') THEN dim_clm_v.dte_clsd_clm 
+ END AS Claim_Closed_Date FORMAT MMDDYY10.,
+
+dim_dfns_nlm_v.nme_stts_curr AS Case_Status, 
+ dim_dfns_nlm_v.dte_stts_regsd AS Case_Registration_Date FORMAT MMDDYY10., 
+ dim_dfns_nlm_v.erls_mttr_strt_dte AS Earliest_Matter_Start_Date FORMAT MMDDYY10., 
+ dim_dfns_nlm_v.dte_stts_regsd AS Case_Opened_Date FORMAT MMDDYY10., 
+ dim_dfns_nlm_v.cse_clsd_dte AS Case_Closed_Date FORMAT MMDDYY10.,
+
+DATEPART(dim_referral_v.oltp_rfrl_crtn_time) AS Referral_Creation_Date FORMAT MMDDYY10., 
+ dim_referral_v.refr_eff_dte AS Referral_Effective_Date FORMAT MMDDYY10.,
+
+CASE 
+ WHEN dim_referral_v.refr_exp_dte LT DATE() THEN dim_referral_v.refr_exp_dte 
+ END as Referral_Expiration_Date FORMAT MMDDYY10.,
+
+cntr_t.dte_cntr_eff AS Contract_Effective_Date FORMAT MMDDYY10., 
+cntr_t.dte_cntr_exp AS Contract_Expiration_Date FORMAT MMDDYY10.,
