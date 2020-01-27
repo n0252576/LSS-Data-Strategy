@@ -1,0 +1,47 @@
+-- ALMS Monthly Batch close process instructions
+-- This Process is different than the ALMS Quarterly Closings...
+
+	1) Save File From Monthly Output - I like to name them with a standard format highlighting the date, so they are easier to order and find history.
+
+	2) Sort the Page by DFNS_ID Ascending or Descending, This will help to eliminate the duplicates in the next step
+
+	3) Highlight the entire Column A, and go to Conditional Formatting -> Highlight Cell Rules -> Duplicates -> Red with Red Text
+
+	4) Now Filter Column A by Color, and select that Red color you just made the duplicates. All duplicates should be present with red text, Exclusively 
+
+	5) Delete ALL Duplicates 
+		TIP- Go to 'Find and Select' on the Home Ribbon of Excel (Top Right)
+			Click 'Go To Special'
+				Click 'Visible Cells Only'
+					Right Click on any cell, then select delete rows
+		
+
+	6) Now Sort the last column, Column N (Provider Type) by Field Legal 
+
+	7) Remove (and Save) all Field Legal Rows from the Sheet in a new tab. 
+	TIP- Go to 'Find and Select' on the Home Ribbon of Excel (Top Right)
+		Click 'Go To Special'
+			Click 'Visible Cells Only'
+				Right Click on any cell, Cut the Field Legal Cells and Put them on a different tab, they will be needed for a quarterly summary sent to Bill Kimball of Field Legal. 
+				
+	8) Filter Row F, Disposition Code, to show all blank values. Insert '51' for all rows with blanks in column F. 
+		The default Disposition Code is 17 (51?) for 'unknown' for PAL & ENV records
+	9) Filter Row G, Closed in Phase, to display the Blanks. Insert  '7' (275?) for all blanks in Column G.
+		Since these are all PAL Records, we will insert '7' for their default values
+	10) Filter Row H, Trial IND, to display all blanks. Insert Zeros for all of the blanks of Column H. 
+	11) Filter Column I, Trial Date, to display all blanks. Since no blank values are allowed, put it todays date for the field
+		=Today()
+	12) Filter Column J, LST_OFFR, to display all blank values. Insert Zeros in for all blank records.
+	13) Filter Column K, LST_DEMD, to display all blank values. Insert Zeros in for all blank records
+	14) Filter Column L, PYMT_RCVD_3P, to display all blank values. Insert Zeros in for all blank records
+	15) Filter Column M, SRCE_LOSS_PYMT, to display all blank values. Insert Zeros in for all blank records
+	16) Remove all Filters on the data. Ensure Column N, Provider Type, has only Outside Counsel Values. If true, delete Column N.
+		 The output template for ALMS is very specific on Column Width, and the additional Provider Type column is not included in that template, it is only used for filtering purposes.
+	17) Change the format off all columns except the date columns to NUMBER. Eliminate the trailing 2 decimal places. Leave the Date Fields as Dates and/or change them back. 
+	18) Delete the Header Row once your formatting is done, ALMS will not accept the file if it is a non numeric format. 
+	19) Save your work as an excel workbook, then save as a CSV
+	20) DO NOT SAVE AS CSV UNTIL YOU HAVE MADE ALL THE CHANGES- CSV files wont contain the saves if you edit them. You need to edit the original again, and then save it as a CSV (not CSV-8!)
+		Save 2 because one will be a CSV just for ALMS Submission, and the second will be a 2 tabbed reference of OC / FL with headers for readability. 
+		
+	21) Record Documents in Teams Folder 
+Email Group 
