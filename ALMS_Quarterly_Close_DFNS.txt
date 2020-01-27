@@ -1,0 +1,27 @@
+-- ALMS Batch DFNS Query
+-- Use this Query to filter the results from the Quarterly report given by ALMS. 
+-- Filter only for DFNS's in the report and enter their defense IDs below
+
+SELECT 
+DISTINCT(DFNS.id_dfns),
+CLM.lin_of_busn,
+CLM.glbl_org_cd
+
+FROM CP_LGL_ALMS_V.dfns_t as DFNS
+
+LEFT JOIN CP_LGL_ALMS_V.dfns_prvd_t AS DFNS_PRVDR
+ON DFNS_PRVDR.id_dfns = DFNS.id_dfns
+
+LEFT JOIN CP_LGL_ALMS_V.dfns_clm_t AS DFNS_CLM
+ON DFNS_CLM.id_dfns = DFNS.id_dfns
+
+LEFT join CP_LGL_ALMS_V.clm_T AS CLM
+ON DFNS_CLM.id_clm = CLM.id_clm
+
+WHERE CLM.lin_of_busn NOT IN ('USCM BI', 'null')
+
+AND DFNS.srvcd_by_prvd_typ = 'OC SERVICED'
+
+AND DFNS.nme_stts_curr = 'OPEN'
+
+AND DFNS.id_dfns IN (
