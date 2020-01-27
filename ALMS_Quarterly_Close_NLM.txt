@@ -1,0 +1,24 @@
+-- Use this Query to help filter the ALMS Quarterly Batch Close Report for NLMs
+-- This Query will help filter the NLM portion of the Batch Report, enter only the Matter ID's below
+
+
+SELECT 
+DISTINCT (NON_LIT.id_mttr),
+CLM.lin_of_busn,
+CLM.glbl_org_cde
+
+FROM CP_LGL_ALMS_V.non_lit_mttr_t AS NON_LIT
+
+LEFT JOIN CP_LGL_ALMS_V.mttr_clm_t AS MTTR_CLM
+ON MTTR_CLM.id_mttr = NON_LIT.id_mttr
+
+LEFT JOIN CP_LGL_ALMS_V.clm_t AS CLM
+ON CLM.id_clm = MTTR_CLM.id_clm
+
+WHERE CLM.lin_of_busn NOT IN ( 'USCM BI' , 'null')
+
+and NON_LIT.srvcd_by_prvd_typ = 'OC SERVICED'
+
+AND nme_stts_curr = 'OPEN'
+
+AND NON_LIT.id_mttr IN (
